@@ -48,7 +48,7 @@ public class VariavelController {
 	@PostMapping("/adicionaValor/{idvariavel}")
 	public ResponseEntity<?> adicionaValor(@PathVariable("idvariavel") Integer idvariavel, @RequestBody VariavelValor valor) {
 		Variavel v = repository.findById(idvariavel).get();
-		if (v.getTipoVariavel() == TipoVariavel.Numerica) {
+		if (v.getTipoVariavel() == TipoVariavel.Numerica.getTipo()) {
 			if (valor.getValor().indexOf(";") != -1) {
 				String[] valores = valor.getValor().split(";");
 				for (int i = valores.length - 1; i >= 0; i--) {

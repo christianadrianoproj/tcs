@@ -29,7 +29,7 @@ public class Variavel {
     private String nome;
     
 	@NotNull    
-    private TipoVariavel tipoVariavel;
+    private Integer tipoVariavel;
 	
     @OneToMany(mappedBy = "variavel")
     private List<VariavelValor> valores;
@@ -50,11 +50,11 @@ public class Variavel {
 		this.nome = nome;
 	}
 
-	public TipoVariavel getTipoVariavel() {
+	public Integer getTipoVariavel() {
 		return tipoVariavel;
 	}
 
-	public void setTipoVariavel(TipoVariavel tipoVariavel) {
+	public void setTipoVariavel(Integer tipoVariavel) {
 		this.tipoVariavel = tipoVariavel;
 	}
 
