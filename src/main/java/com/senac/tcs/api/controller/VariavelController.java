@@ -41,7 +41,7 @@ public class VariavelController {
 	}
 
 	@PostMapping("/salvaVariavel")
-	public Variavel salvaVenda(@RequestBody Variavel v) {
+	public Variavel salvaVariavel(@RequestBody Variavel v) {
 		return repository.save(v);
 	}
 

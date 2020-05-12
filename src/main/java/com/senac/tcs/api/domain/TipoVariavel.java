@@ -8,13 +8,13 @@ package com.senac.tcs.api.domain;
 public enum TipoVariavel {
 	Numerica(0), Univalorada(1),Multivalorada_(2);
 	
-    private final int tipo;
+    private final Integer tipo;
     
-    TipoVariavel(int _tipo){
+    TipoVariavel(Integer _tipo){
     	tipo = _tipo;
     }
     
-    public int getTipo(){
+    public Integer getTipo(){
         return tipo;
     }
 	
