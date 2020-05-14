@@ -36,7 +36,7 @@ public class VariavelController {
 	private VariavelValorRepository repositoryVariavelValor;
 
 	@GetMapping
-	public List<Variavel> findAll() {
+	public List<Variavel> findAll() {		
 		return repository.findAll();
 	}
 
