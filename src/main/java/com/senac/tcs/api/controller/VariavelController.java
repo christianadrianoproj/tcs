@@ -36,7 +36,7 @@ public class VariavelController {
 	private VariavelValorRepository repositoryVariavelValor;
 
 	@GetMapping
-	public List<Variavel> findAll() {		
+	public List<Variavel> findAll() {
 		return repository.findAll();
 	}
 
@@ -46,30 +46,16 @@ public class VariavelController {
 	}
 
 	@PostMapping("/adicionaValor/{idvariavel}")
-	public ResponseEntity<?> adicionaValor(@PathVariable("idvariavel") Integer idvariavel, @RequestBody VariavelValor valor) {
+	public ResponseEntity<?> adicionaValor(@PathVariable("idvariavel") Integer idvariavel,
+			@RequestBody VariavelValor valor) {
 		Variavel v = repository.findById(idvariavel).get();
-		if (v.getTipoVariavel() == TipoVariavel.Numerica.getTipo()) {
-			if (valor.getValor().indexOf(";") != -1) {
-				String[] valores = valor.getValor().split(";");
-				for (int i = valores.length - 1; i >= 0; i--) {
-					VariavelValor vv = new VariavelValor();
-					vv.setVariavel(v);
-					vv.setValor(valores[i]);
-					repositoryVariavelValor.save(vv);
-				}
-			} else {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(String.format("Variavel %s : Valor inaceitável de intervalo. Deixe os valores em branco ou coloqueo um intervalo do tipo \"min;max\".",v.getNome()));
-			}
-
+		if (valor.getValor().trim().equals("")) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(String.format("Variavel %s : Informe o valor.", v.getNome()));
 		} else {
-			if (valor.getValor().trim().equals("")) {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(String.format("Variavel %s : Informe o valor.",v.getNome()));		
-			}
-			else {
-				valor.setVariavel(v);
-				repositoryVariavelValor.save(valor);
-			}
-		} 
+			valor.setVariavel(v);
+			repositoryVariavelValor.save(valor);
+		}
 		Optional<Variavel> var = repository.findById(v.getIdVariavel());
 		return ResponseEntity.ok(var.get());
 	}

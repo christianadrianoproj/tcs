@@ -1,17 +1,26 @@
 package com.senac.tcs.api.controller;
 
+import java.text.DecimalFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import com.senac.tcs.api.domain.ExecucaoResposta;
+import com.senac.tcs.api.domain.ExecucaoRegraResposta;
+import com.senac.tcs.api.domain.ExecucaoRegra;
 import com.senac.tcs.api.domain.Regra;
 import com.senac.tcs.api.domain.RegraItem;
 import com.senac.tcs.api.domain.TipoConectivo;
 import com.senac.tcs.api.domain.TipoVariavel;
-import com.senac.tcs.api.repository.ExecucaoRespostaRepository;
+import com.senac.tcs.api.repository.ExecucaoRegraRespostaRepository;
+import com.senac.tcs.api.repository.ExecucaoRegraRepository;
 import com.senac.tcs.api.domain.Execucao;
 import com.senac.tcs.api.repository.ExecucaoRepository;
+import com.senac.tcs.api.repository.ImageRepository;
+import com.senac.tcs.api.repository.RegraRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -37,11 +46,49 @@ public class ExecucaoController {
 	private ExecucaoRepository repository;
 
 	@Autowired
-	private ExecucaoRespostaRepository repositoryExecucaoResposta;
+	private ExecucaoRegraRespostaRepository repositoryExecucaoRegraResposta;
 
-	@GetMapping
-	public List<Execucao> findAll() {
-		return repository.findAll();
+	@Autowired
+	private ExecucaoRegraRepository repositoryExecucaoRegra;
+	
+	@Autowired
+	private RegraRepository repositoryRegra;
+	
+	@Autowired
+	private ImageRepository repositoryImage;
+	
+	private String logTomadaDecisao = "";
+	
+	@PostMapping("/iniciaExecucao/{idimage}")
+	public ResponseEntity<?> iniciaExecucao(@PathVariable("idimage") Integer idimage) {
+		Execucao exec = new Execucao();
+		
+		if (idimage > 0) {
+			exec.setImage(repositoryImage.getOne(idimage));
+		}
+		exec.setDatahora(LocalDateTime.of(LocalDate.now(), LocalTime.now()));
+		exec.setRegras(new ArrayList<ExecucaoRegra>());
+		exec = repository.save(exec);
+		
+		for (Regra regra : repositoryRegra.findAll()) {
+			ExecucaoRegra execRegra = new ExecucaoRegra();
+			execRegra.setExecucao(exec);
+			execRegra.setRespostas(new ArrayList<ExecucaoRegraResposta>());
+			execRegra.setRegra(regra);
+			execRegra = repositoryExecucaoRegra.save(execRegra);
+			
+			for (RegraItem item : regra.getItens()) {
+				if (!item.getPergunta().trim().equals("")) {
+					ExecucaoRegraResposta resposta = new ExecucaoRegraResposta();
+					resposta.setExecucaoRegra(execRegra);
+					resposta.setRegraItem(item);
+					resposta.setResposta(null);
+					resposta = repositoryExecucaoRegraResposta.save(resposta);			
+				}	
+			}
+		}
+		Optional<Execucao> r = repository.findById(exec.getIdExecucao());
+		return ResponseEntity.ok(r.get());
 	}
 
 	@PostMapping("/salvaExecucao")
@@ -49,19 +96,19 @@ public class ExecucaoController {
 		return repository.save(v);
 	}
 
-	@PostMapping("/adicionaResposta/{idexecucao}")
+	@PostMapping("/adicionaRegra/{idexecucao}")
 	public ResponseEntity<?> adicionaValor(@PathVariable("idexecucao") Integer idexecucao,
-			@RequestBody ExecucaoResposta resposta) {
+			@RequestBody ExecucaoRegra regra) {
 		Execucao exec = repository.findById(idexecucao).get();
-		resposta.setExecucao(exec);
-		repositoryExecucaoResposta.save(resposta);
+		regra.setExecucao(exec);
+		repositoryExecucaoRegra.save(regra);
 		Optional<Execucao> r = repository.findById(idexecucao);
 		return ResponseEntity.ok(r.get());
 	}
 
-	@PostMapping("/deletaResposta/{idexecucao}")
-	public Execucao deleteItem(@PathVariable("idexecucao") Integer idexecucao, @RequestBody ExecucaoResposta resposta) {
-		repositoryExecucaoResposta.deleteById(resposta.getIdExecucaoResposta());
+	@PostMapping("/deletaRegra/{idexecucao}")
+	public Execucao deleteItem(@PathVariable("idexecucao") Integer idexecucao, @RequestBody ExecucaoRegra regra) {
+		repositoryExecucaoRegra.deleteById(regra.getIdExecucaoRegra());
 		return repository.findById(idexecucao).get();
 	}
 
@@ -77,28 +124,41 @@ public class ExecucaoController {
 	@DeleteMapping("/{id}")
 	public void delete(@PathVariable("id") Integer id) {
 		Execucao exec = repository.findById(id).get();
-		for (ExecucaoResposta i : exec.getRespostas()) {
-			repositoryExecucaoResposta.deleteById(i.getIdExecucaoResposta());
+		for (ExecucaoRegra i : exec.getRegras()) {
+			repositoryExecucaoRegra.deleteById(i.getIdExecucaoRegra());
 		}
 		repository.deleteById(id);
 	}
 
 	private List<Regra> getRegrasRespondidas(Execucao exec) {
 		List<Regra> lista = new ArrayList<Regra>();
-		for (ExecucaoResposta i : exec.getRespostas()) {
-			if (lista.indexOf(i.getRegraItem().getRegra()) == -1) {
-				lista.add(i.getRegraItem().getRegra());
+		for (ExecucaoRegra i : exec.getRegras()) {
+			if (lista.indexOf(i.getRegra()) == -1) {
+				lista.add(i.getRegra());
 			}
 		}
 		return lista;
 	}
 
-	private List<ExecucaoResposta> getRespostasByRegra(Execucao exec, Regra regra) {
-		List<ExecucaoResposta> lista = new ArrayList<ExecucaoResposta>();
-		for (ExecucaoResposta i : exec.getRespostas()) {
-			if (i.getRegraItem().getRegra().getIdRegra() == regra.getIdRegra()) {
-				if (lista.indexOf(i) == -1) {
-					lista.add(i);
+	private ExecucaoRegra getExecucaoRegra(Execucao exec, Regra regra) {
+		ExecucaoRegra objRegra = null;
+		for (ExecucaoRegra i : exec.getRegras()) {
+			if (i.getRegra().getIdRegra() == regra.getIdRegra()) {
+				objRegra = i;
+				break;
+			}
+		}
+		return objRegra;
+	}
+
+	private List<ExecucaoRegraResposta> getRespostasByRegra(Execucao exec, Regra regra) {
+		List<ExecucaoRegraResposta> lista = new ArrayList<ExecucaoRegraResposta>();
+		for (ExecucaoRegra i : exec.getRegras()) {
+			if (i.getRegra().getIdRegra() == regra.getIdRegra()) {
+				for (ExecucaoRegraResposta execucaoRegraResposta : i.getRespostas()) {
+					if (lista.indexOf(execucaoRegraResposta) == -1) {
+						lista.add(execucaoRegraResposta);
+					}
 				}
 			}
 		}
@@ -109,38 +169,39 @@ public class ExecucaoController {
 		Integer conectivo = item.getConectivo();
 		String Condicional = item.getCondicional();
 		if (conectivo == TipoConectivo._IF_.getOpcao()) {
-			System.out.println("     SE " + item.getVariavel().getNome() + " " + Condicional + " "
-					+ item.getVariavelValor().getValor() + " (Resposta: " + valorResposta + ")");
+			logTomadaDecisao += "     SE " + item.getVariavel().getNome() + " " + Condicional + " "
+					+ item.getVariavelValor().getValor() + " (Resposta: " + valorResposta + ") \n";
 
 		} else if (conectivo == TipoConectivo._AND_.getOpcao()) {
-			System.out.println("     E " + item.getVariavel().getNome() + " " + Condicional + " "
-					+ item.getVariavelValor().getValor() + " (Resposta: " + valorResposta + ")");
+			logTomadaDecisao += "     E " + item.getVariavel().getNome() + " " + Condicional + " "
+					+ item.getVariavelValor().getValor() + " (Resposta: " + valorResposta + ") \n";
 
 		} else if (conectivo == TipoConectivo._OR_.getOpcao()) {
-			System.out.println("     OU " + item.getVariavel().getNome() + " " + Condicional + " "
-					+ item.getVariavelValor().getValor() + " (Resposta: " + valorResposta + ")");
+			logTomadaDecisao += "     OU " + item.getVariavel().getNome() + " " + Condicional + " "
+					+ item.getVariavelValor().getValor() + " (Resposta: " + valorResposta + ") \n";
 
 		}
 	}
 
 	private void escreveLogsEntao(Regra regra, Boolean resultadoRegra) {
-		System.out.println("     ENTÃO " + resultadoRegra);
-		System.out.println(" RESULTADO DA " + regra.getNome().toUpperCase() + ": " + resultadoRegra);
-		System.out.println(" ");
+		logTomadaDecisao += "     ENTÃO " + resultadoRegra+"\n";
+		logTomadaDecisao += " RESULTADO DA " + regra.getNome().toUpperCase() + ": "+ resultadoRegra+"\n";
+		logTomadaDecisao += "\n";
 	}
 
 	@GetMapping("/tomadaDecisao/{idexecucao}")
 	public Execucao tomadadeDeDecisao(@PathVariable("idexecucao") Integer idexecucao) {
 		Execucao exec = repository.findById(idexecucao).get();
+		logTomadaDecisao = "";
 		if (exec.getConcluido() != null) {
 			for (Regra regra : getRegrasRespondidas(exec)) {
 				Boolean condicaoItemRegra = false;
 				List<Boolean> validacaoItemRegra = new ArrayList<Boolean>();
 				List<Integer> conectivoItemRegra = new ArrayList<Integer>();
-				System.out.println("------------------------------------------------------------");
+				logTomadaDecisao += "------------------------------------------------------------\n";
 
 				// executa validacao item a item da regra
-				for (ExecucaoResposta i : getRespostasByRegra(exec, regra)) {
+				for (ExecucaoRegraResposta i : getRespostasByRegra(exec, regra)) {
 
 					String Condicional = i.getRegraItem().getCondicional();
 					String valorResposta = i.getResposta().getValor();
@@ -149,7 +210,7 @@ public class ExecucaoController {
 					Integer conectivo = i.getRegraItem().getConectivo();
 
 					escreveLogsSE(i.getRegraItem(), valorResposta);
-
+					
 					if (tipoVariavel == TipoVariavel.Numerica.getTipo()) {
 						if (Condicional.equals("=")) {
 							if (Float.parseFloat(valorRegra) == Float.parseFloat(valorResposta)) {
@@ -210,6 +271,8 @@ public class ExecucaoController {
 					}
 					validacaoItemRegra.add(condicaoItemRegra);
 					conectivoItemRegra.add(conectivo);
+					i.setAcertou(condicaoItemRegra);
+					repositoryExecucaoRegraResposta.save(i);
 				}
 
 				// junta as validacoes dos itens na regra
@@ -230,8 +293,17 @@ public class ExecucaoController {
 					}
 				}
 				escreveLogsEntao(regra, resultadoRegra);
+				ExecucaoRegra execRegra = getExecucaoRegra(exec, regra);
+				if (execRegra != null) {
+					execRegra.setValidou(resultadoRegra);
+					repositoryExecucaoRegra.save(execRegra);
+				}
 			}
 		}
+		exec = repository.getOne(exec.getIdExecucao());
+		logTomadaDecisao += " PERCENTUAL DE ACERTO: " + (new DecimalFormat("###.##")).format(exec.getPercentualAcerto())+"% \n";
+		logTomadaDecisao += "\n";
+		System.out.println(logTomadaDecisao);
 		return exec;
 	}
 }

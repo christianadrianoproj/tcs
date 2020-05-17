@@ -18,12 +18,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 
 @Entity
-@Table(name = "tb_execucao_resposta")
-public class ExecucaoResposta {
+@Table(name = "tb_execucao_regra_resposta")
+public class ExecucaoRegraResposta {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id_execucao_resposta")
-	private Integer idExecucaoResposta;
+	@Column(name = "id_execucao_regra_resposta")
+	private Integer idExecucaoRegraResposta;
 
 	@ManyToOne
 	@JoinColumn(name = "id_regra_item")
@@ -31,22 +31,24 @@ public class ExecucaoResposta {
 	private RegraItem regraItem;
 
 	@ManyToOne
-	@JoinColumn(name = "id_execucao")
+	@JoinColumn(name = "id_execucao_regra")
 	@NotNull
 	@JsonIgnore
-	private Execucao execucao;
-	
+	private ExecucaoRegra execucaoRegra;
+
 	@ManyToOne
-	@JoinColumn(name="id_variavel_valor")
-	@NotNull    
+	@JoinColumn(name = "id_variavel_valor")
+	// @NotNull
 	private VariavelValor resposta;
 
-	public Integer getIdExecucaoResposta() {
-		return idExecucaoResposta;
+	private Boolean acertou;
+
+	public Integer getIdExecucaoRegraResposta() {
+		return idExecucaoRegraResposta;
 	}
 
-	public void setIdExecucaoResposta(Integer idExecucaoResposta) {
-		this.idExecucaoResposta = idExecucaoResposta;
+	public void setIdExecucaoRegraResposta(Integer idExecucaoRegraResposta) {
+		this.idExecucaoRegraResposta = idExecucaoRegraResposta;
 	}
 
 	public RegraItem getRegraItem() {
@@ -57,12 +59,12 @@ public class ExecucaoResposta {
 		this.regraItem = regraItem;
 	}
 
-	public Execucao getExecucao() {
-		return execucao;
+	public ExecucaoRegra getExecucaoRegra() {
+		return execucaoRegra;
 	}
 
-	public void setExecucao(Execucao execucao) {
-		this.execucao = execucao;
+	public void setExecucaoRegra(ExecucaoRegra execucaoRegra) {
+		this.execucaoRegra = execucaoRegra;
 	}
 
 	public VariavelValor getResposta() {
@@ -71,6 +73,18 @@ public class ExecucaoResposta {
 
 	public void setResposta(VariavelValor resposta) {
 		this.resposta = resposta;
-	}	
+	}
+
+	public Boolean getAcertou() {
+		if (acertou != null) {
+			return acertou;
+		} else {
+			return false;
+		}
+	}
+
+	public void setAcertou(Boolean acertou) {
+		this.acertou = acertou;
+	}
 
 }

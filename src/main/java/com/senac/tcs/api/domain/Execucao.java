@@ -9,9 +9,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  *
@@ -31,12 +35,14 @@ public class Execucao {
 	private LocalDateTime datahora;
 
 	@OneToMany(mappedBy = "execucao")
-	private List<ExecucaoResposta> respostas;
+	private List<ExecucaoRegra> regras;
 
 	private LocalDate concluido;
 
-	@Column(name = "id_image")
-	private Integer image;
+	@ManyToOne
+	@JoinColumn(name = "id_image")
+	@JsonIgnore
+	private Image image;
 
 	public Integer getIdExecucao() {
 		return idExecucao;
@@ -54,14 +60,6 @@ public class Execucao {
 		this.datahora = datahora;
 	}
 
-	public List<ExecucaoResposta> getRespostas() {
-		return respostas;
-	}
-
-	public void setRespostas(List<ExecucaoResposta> respostas) {
-		this.respostas = respostas;
-	}
-
 	public LocalDate getConcluido() {
 		return concluido;
 	}
@@ -70,12 +68,33 @@ public class Execucao {
 		this.concluido = concluido;
 	}
 
-	public Integer getImage() {
+	public Image getImage() {
 		return image;
 	}
 
-	public void setImage(Integer image) {
+	public void setImage(Image image) {
 		this.image = image;
 	}
 
+	public List<ExecucaoRegra> getRegras() {
+		return regras;
+	}
+
+	public void setRegras(List<ExecucaoRegra> regras) {
+		this.regras = regras;
+	}
+
+	public Double getPercentualAcerto() {
+		Double perc = 0.0d;
+		int quantAcertos = 0;
+		if (regras.size() > 0) {
+			for (ExecucaoRegra execRegra : regras) {
+				if (execRegra.getValidou()) {
+					quantAcertos++;
+				}
+			}
+			perc = (double) ((quantAcertos * 100) / regras.size());
+		}
+		return perc;
+	}
 }
