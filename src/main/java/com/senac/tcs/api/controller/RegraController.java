@@ -1,6 +1,7 @@
 package com.senac.tcs.api.controller;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,13 +45,28 @@ public class RegraController {
 	public List<Regra> findAll() {
 		return repository.findAll();
 	}
+	
+	@GetMapping("/perguntas")
+	public List<Regra> getPerguntas() {
+		List<Regra> lista = new ArrayList<Regra>();
+		for (Regra regra : repository.findAll()) {
+			for (RegraItem item : regra.getItens()) {
+				if (!item.getPergunta().trim().equals("")) {
+					if (lista.indexOf(regra) == -1) {
+						lista.add(regra);
+					}					
+				}	
+			}
+		}
+		return lista;
+	}
 
 	@PostMapping("/salvaRegra")
 	public Regra salvaRegra(@RequestBody Regra v) {
 		return repository.save(v);
 	}
 
-	@PostMapping("/adicionaItemRegra/{idregra}")
+	@PostMapping("/adicionaItem/{idregra}")
 	public ResponseEntity<?> adicionaValor(@PathVariable("idregra") Integer idregra, @RequestBody RegraItem item) {
 		Regra regra = repository.findById(idregra).get();
 		item.setRegra(regra);
@@ -59,7 +75,7 @@ public class RegraController {
 		return ResponseEntity.ok(r.get());
 	}
 
-	@PostMapping("/adicionaResultado/{idregra}")
+	@PostMapping("/adicionaItemResultado/{idregra}")
 	public ResponseEntity<?> adicionaValor(@PathVariable("idregra") Integer idregra, @RequestBody RegraItemResultado item) {
 		Regra regra = repository.findById(idregra).get();
 		item.setRegra(regra);
@@ -68,13 +84,13 @@ public class RegraController {
 		return ResponseEntity.ok(r.get());
 	}
 	
-	@PostMapping("/deleteItem/{idregra}")
+	@PostMapping("/deletaItem/{idregra}")
 	public Regra deleteItem(@PathVariable("idregra") Integer idregra, @RequestBody RegraItem item) {
 		repositoryRegraItem.deleteById(item.getIdRegraItem());
 		return repository.findById(idregra).get();
 	}
 
-	@PostMapping("/deleteResultado/{idregra}")
+	@PostMapping("/deletaItemResultado/{idregra}")
 	public Regra deleteResultado(@PathVariable("idregra") Integer idregra, @RequestBody RegraItemResultado item) {
 		repositoryRegraItemResultado.deleteById(item.getIdRegraItemResultado());
 		return repository.findById(idregra).get();

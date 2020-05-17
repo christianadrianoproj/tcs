@@ -25,7 +25,7 @@ public class RegraItem {
     private Integer idRegraItem;
 	
 	@NotNull
-    private TipoConectivo conectivo; /* SE/E/OU */
+    private Integer conectivo; /* 0-SE; 1-E; 2-OU */
 	
 	@ManyToOne
 	@JoinColumn(name="id_variavel")
@@ -39,6 +39,9 @@ public class RegraItem {
 	@JoinColumn(name="id_variavel_valor")
 	@NotNull    
 	private VariavelValor variavelValor;
+	
+    @Column(length = 500)
+    private String pergunta;
 	
 	@ManyToOne
 	@JoinColumn(name="id_regra")
@@ -54,11 +57,11 @@ public class RegraItem {
 		this.idRegraItem = idRegraItem;
 	}
 
-	public TipoConectivo getConectivo() {
+	public Integer getConectivo() {
 		return conectivo;
 	}
 
-	public void setConectivo(TipoConectivo conectivo) {
+	public void setConectivo(Integer conectivo) {
 		this.conectivo = conectivo;
 	}
 
@@ -68,6 +71,14 @@ public class RegraItem {
 
 	public void setVariavel(Variavel variavel) {
 		this.variavel = variavel;
+	}
+
+	public String getPergunta() {
+		return pergunta;
+	}
+
+	public void setPergunta(String pergunta) {
+		this.pergunta = pergunta;
 	}
 
 	public String getCondicional() {
@@ -93,4 +104,5 @@ public class RegraItem {
 	public void setRegra(Regra regra) {
 		this.regra = regra;
 	}	
+	
 }

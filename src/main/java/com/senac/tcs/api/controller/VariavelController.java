@@ -74,7 +74,7 @@ public class VariavelController {
 		return ResponseEntity.ok(var.get());
 	}
 
-	@PostMapping("/deleteValor/{idvariavel}")
+	@PostMapping("/deletaValor/{idvariavel}")
 	public Variavel deleteItem(@PathVariable("idvariavel") Integer idvariavel, @RequestBody VariavelValor valor) {
 		repositoryVariavelValor.deleteById(valor.getIdVariavelValor());
 		return repository.findById(idvariavel).get();
