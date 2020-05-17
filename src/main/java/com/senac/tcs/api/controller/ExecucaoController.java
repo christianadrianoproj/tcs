@@ -50,41 +50,41 @@ public class ExecucaoController {
 
 	@Autowired
 	private ExecucaoRegraRepository repositoryExecucaoRegra;
-	
+
 	@Autowired
 	private RegraRepository repositoryRegra;
-	
+
 	@Autowired
 	private ImageRepository repositoryImage;
-	
+
 	private String logTomadaDecisao = "";
-	
+
 	@PostMapping("/iniciaExecucao/{idimage}")
 	public ResponseEntity<?> iniciaExecucao(@PathVariable("idimage") Integer idimage) {
 		Execucao exec = new Execucao();
-		
+
 		if (idimage > 0) {
 			exec.setImage(repositoryImage.getOne(idimage));
 		}
 		exec.setDatahora(LocalDateTime.of(LocalDate.now(), LocalTime.now()));
 		exec.setRegras(new ArrayList<ExecucaoRegra>());
 		exec = repository.save(exec);
-		
+
 		for (Regra regra : repositoryRegra.findAll()) {
 			ExecucaoRegra execRegra = new ExecucaoRegra();
 			execRegra.setExecucao(exec);
 			execRegra.setRespostas(new ArrayList<ExecucaoRegraResposta>());
 			execRegra.setRegra(regra);
 			execRegra = repositoryExecucaoRegra.save(execRegra);
-			
+
 			for (RegraItem item : regra.getItens()) {
 				if (!item.getPergunta().trim().equals("")) {
 					ExecucaoRegraResposta resposta = new ExecucaoRegraResposta();
 					resposta.setExecucaoRegra(execRegra);
 					resposta.setRegraItem(item);
 					resposta.setResposta(null);
-					resposta = repositoryExecucaoRegraResposta.save(resposta);			
-				}	
+					resposta = repositoryExecucaoRegraResposta.save(resposta);
+				}
 			}
 		}
 		Optional<Execucao> r = repository.findById(exec.getIdExecucao());
@@ -184,8 +184,8 @@ public class ExecucaoController {
 	}
 
 	private void escreveLogsEntao(Regra regra, Boolean resultadoRegra) {
-		logTomadaDecisao += "     ENTÃO " + resultadoRegra+"\n";
-		logTomadaDecisao += " RESULTADO DA " + regra.getNome().toUpperCase() + ": "+ resultadoRegra+"\n";
+		logTomadaDecisao += "     ENTÃO " + resultadoRegra + "\n";
+		logTomadaDecisao += " RESULTADO DA " + regra.getNome().toUpperCase() + ": " + resultadoRegra + "\n";
 		logTomadaDecisao += "\n";
 	}
 
@@ -210,7 +210,7 @@ public class ExecucaoController {
 					Integer conectivo = i.getRegraItem().getConectivo();
 
 					escreveLogsSE(i.getRegraItem(), valorResposta);
-					
+
 					if (tipoVariavel == TipoVariavel.Numerica.getTipo()) {
 						if (Condicional.equals("=")) {
 							if (Float.parseFloat(valorRegra) == Float.parseFloat(valorResposta)) {
@@ -299,11 +299,15 @@ public class ExecucaoController {
 					repositoryExecucaoRegra.save(execRegra);
 				}
 			}
+			exec = repository.getOne(exec.getIdExecucao());
+			logTomadaDecisao += " PERCENTUAL DE ACERTO: "
+					+ (new DecimalFormat("###.##")).format(exec.getPercentualAcerto()) + "% \n";
+			logTomadaDecisao += "\n";
+			System.out.println(logTomadaDecisao);
+		} else {
+			exec = null;
 		}
-		exec = repository.getOne(exec.getIdExecucao());
-		logTomadaDecisao += " PERCENTUAL DE ACERTO: " + (new DecimalFormat("###.##")).format(exec.getPercentualAcerto())+"% \n";
-		logTomadaDecisao += "\n";
-		System.out.println(logTomadaDecisao);
+
 		return exec;
 	}
 }
