@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import com.senac.tcs.api.domain.VariavelValor;
 import com.senac.tcs.api.repository.VariavelValorRepository;
-import com.senac.tcs.api.domain.TipoVariavel;
 import com.senac.tcs.api.domain.Variavel;
 import com.senac.tcs.api.repository.VariavelRepository;
 import org.springframework.beans.factory.annotation.Autowired;

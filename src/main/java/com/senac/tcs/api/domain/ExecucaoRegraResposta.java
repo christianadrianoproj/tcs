@@ -27,7 +27,7 @@ public class ExecucaoRegraResposta {
 
 	@ManyToOne
 	@JoinColumn(name = "id_regra_item")
-	@NotNull
+	//@NotNull
 	private RegraItem regraItem;
 
 	@ManyToOne

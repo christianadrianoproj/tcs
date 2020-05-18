@@ -15,8 +15,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 /**
  *
  * @author Christian
@@ -41,7 +39,7 @@ public class Execucao {
 
 	@ManyToOne
 	@JoinColumn(name = "id_image")
-	@JsonIgnore
+	//@JsonIgnore
 	private Image image;
 
 	public Integer getIdExecucao() {

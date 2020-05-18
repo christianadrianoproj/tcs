@@ -38,7 +38,7 @@ public class ExecucaoRegra {
 	@ManyToOne
 	@JoinColumn(name = "id_regra")
 	@NotNull
-	@JsonIgnore
+	//@JsonIgnore
 	private Regra regra;
 
 	@OneToMany(mappedBy = "execucaoRegra")
