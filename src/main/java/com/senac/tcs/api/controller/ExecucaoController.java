@@ -95,9 +95,9 @@ public class ExecucaoController {
 		return ResponseEntity.ok(r.get());
 	}
 
-	@PostMapping("/adicionaRespostas/{idexecucao}/{arrayRespostas}")
+	@PostMapping("/adicionaRespostas/{idexecucao}")
 	public ResponseEntity<?> iniciaExecucao(@PathVariable("idexecucao") Integer idexecucao,
-			@PathVariable("arrayRespostas") List<String> arrayRespostas) {
+			@RequestBody List<String> arrayRespostas) {
 
 		Execucao exec = repository.getOne(idexecucao);
 
