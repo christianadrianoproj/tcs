@@ -1,5 +1,7 @@
 package com.senac.tcs.api.domain;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,7 +17,12 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "image")
-public class Image {
+public class Image implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4445351730138046296L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="id")

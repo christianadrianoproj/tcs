@@ -99,6 +99,8 @@ public class ExecucaoController {
 	public ResponseEntity<?> iniciaExecucao(@PathVariable("idexecucao") Integer idexecucao,
 			@RequestBody List<String> arrayRespostas) {
 
+		System.out.println("idexecucao: " + idexecucao);
+		System.out.println("arrayRespostas: " + arrayRespostas);
 		Execucao exec = repository.getOne(idexecucao);
 
 		for (ExecucaoRegra regra : exec.getRegras()) {
