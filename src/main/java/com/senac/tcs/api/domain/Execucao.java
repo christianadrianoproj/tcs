@@ -30,16 +30,16 @@ public class Execucao {
 
 	@NotNull
 	private LocalDateTime datahora;
+	
+	@ManyToOne
+	@JoinColumn(name = "id_image")
+	//@JsonIgnore
+	private Image image;
 
 	@OneToMany(mappedBy = "execucao")
 	private List<ExecucaoRegra> regras;
 
 	private LocalDateTime concluido;
-
-	@ManyToOne
-	@JoinColumn(name = "id_image")
-	//@JsonIgnore
-	private Image image;
 
 	public Integer getIdExecucao() {
 		return idExecucao;

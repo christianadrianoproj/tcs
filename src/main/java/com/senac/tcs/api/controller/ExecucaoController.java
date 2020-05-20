@@ -64,7 +64,7 @@ public class ExecucaoController {
 	private String logTomadaDecisao = "";
 
 	@PostMapping("/iniciaExecucao/{idimage}")
-	public ResponseEntity<?> iniciaExecucao(@PathVariable("idimage") Integer idimage) {
+	public Execucao iniciaExecucao(@PathVariable("idimage") Integer idimage) {
 		Execucao exec = new Execucao();
 
 		if (idimage > 0) {
@@ -72,37 +72,40 @@ public class ExecucaoController {
 		}
 		exec.setDatahora(LocalDateTime.of(LocalDate.now(), LocalTime.now()));
 		exec.setRegras(new ArrayList<ExecucaoRegra>());
-		exec = repository.save(exec);
-
+		Execucao e = repository.save(exec);
+		exec.setIdExecucao(e.getIdExecucao());
+		System.out.println("Execucao Criado: " + exec.getIdExecucao());
 		for (Regra regra : repositoryRegra.findAll()) {
 			ExecucaoRegra execRegra = new ExecucaoRegra();
 			execRegra.setExecucao(exec);
 			execRegra.setRespostas(new ArrayList<ExecucaoRegraResposta>());
 			execRegra.setRegra(regra);
-			execRegra = repositoryExecucaoRegra.save(execRegra);
-
+			ExecucaoRegra er = repositoryExecucaoRegra.save(execRegra);
+			execRegra.setIdExecucaoRegra(er.getIdExecucaoRegra());
+			System.out.println("ExecucaoRegra Criado: " + execRegra.getIdExecucaoRegra());
 			for (RegraItem item : regra.getItens()) {
-				if (!item.getPergunta().trim().equals("")) {
-					ExecucaoRegraResposta resposta = new ExecucaoRegraResposta();
-					resposta.setExecucaoRegra(execRegra);
-					resposta.setRegraItem(item);
-					resposta.setResposta(null);
-					resposta = repositoryExecucaoRegraResposta.save(resposta);
-				}
+				ExecucaoRegraResposta resposta = new ExecucaoRegraResposta();
+				resposta.setExecucaoRegra(execRegra);
+				resposta.setRegraItem(item);
+				resposta.setResposta(null);
+				ExecucaoRegraResposta resp = repositoryExecucaoRegraResposta.save(resposta);
+				resposta.setIdExecucaoRegraResposta(resp.getIdExecucaoRegraResposta());
+				System.out.println("ExecucaoRegraResposta Criado: " + resposta.getIdExecucaoRegraResposta());
+				execRegra.getRespostas().add(resposta);
 			}
+			exec.getRegras().add(execRegra);
 		}
-		Optional<Execucao> r = repository.findById(exec.getIdExecucao());
-		return ResponseEntity.ok(r.get());
+		// Optional<Execucao> r = repository.findById(exec.getIdExecucao());
+		// return ResponseEntity.ok(r.get());
+		return exec;
 	}
 
 	@PostMapping("/adicionaRespostas/{idexecucao}")
 	public ResponseEntity<?> iniciaExecucao(@PathVariable("idexecucao") Integer idexecucao,
 			@RequestBody List<String> arrayRespostas) {
-
-		System.out.println("idexecucao: " + idexecucao);
-		System.out.println("arrayRespostas: " + arrayRespostas);
+		/*System.out.println("idexecucao: " + idexecucao);
+		System.out.println("arrayRespostas: " + arrayRespostas);*/
 		Execucao exec = repository.getOne(idexecucao);
-
 		for (ExecucaoRegra regra : exec.getRegras()) {
 			for (ExecucaoRegraResposta resp : regra.getRespostas()) {
 				for (String param : arrayRespostas) {
