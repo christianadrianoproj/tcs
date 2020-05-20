@@ -20,6 +20,7 @@ import com.senac.tcs.api.domain.Execucao;
 import com.senac.tcs.api.repository.ExecucaoRepository;
 import com.senac.tcs.api.repository.ImageRepository;
 import com.senac.tcs.api.repository.RegraRepository;
+import com.senac.tcs.api.repository.VariavelValorRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -57,6 +58,9 @@ public class ExecucaoController {
 	@Autowired
 	private ImageRepository repositoryImage;
 
+	@Autowired
+	VariavelValorRepository repositoryVariavelValor;
+
 	private String logTomadaDecisao = "";
 
 	@PostMapping("/iniciaExecucao/{idimage}")
@@ -87,6 +91,39 @@ public class ExecucaoController {
 				}
 			}
 		}
+		Optional<Execucao> r = repository.findById(exec.getIdExecucao());
+		return ResponseEntity.ok(r.get());
+	}
+
+	@PostMapping("/adicionaRespostas/{idexecucao}/{arrayRespostas}")
+	public ResponseEntity<?> iniciaExecucao(@PathVariable("idexecucao") Integer idexecucao,
+			@PathVariable("arrayRespostas") List<String> arrayRespostas) {
+
+		Execucao exec = repository.getOne(idexecucao);
+
+		for (ExecucaoRegra regra : exec.getRegras()) {
+			for (ExecucaoRegraResposta resp : regra.getRespostas()) {
+				for (String param : arrayRespostas) {
+					if (resp.getRegraItem().getVariavelValor().getIdVariavelValor() == Integer.parseInt(param)) {
+						if (resp.getResposta() == null) {
+							resp.setResposta(repositoryVariavelValor.getOne(Integer.parseInt(param)));
+							repositoryExecucaoRegraResposta.save(resp);
+						}
+					}
+				}
+			}
+		}
+		for (ExecucaoRegra regra : exec.getRegras()) {
+			for (ExecucaoRegraResposta resp : regra.getRespostas()) {
+				if (resp.getResposta() == null) {
+					resp.setResposta(repositoryVariavelValor.getOne(1));
+					repositoryExecucaoRegraResposta.save(resp);
+				}
+			}
+		}
+		exec.setConcluido(LocalDateTime.of(LocalDate.now(), LocalTime.now()));
+		repository.save(exec);
+
 		Optional<Execucao> r = repository.findById(exec.getIdExecucao());
 		return ResponseEntity.ok(r.get());
 	}

@@ -1,6 +1,5 @@
 package com.senac.tcs.api.domain;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -35,7 +34,7 @@ public class Execucao {
 	@OneToMany(mappedBy = "execucao")
 	private List<ExecucaoRegra> regras;
 
-	private LocalDate concluido;
+	private LocalDateTime concluido;
 
 	@ManyToOne
 	@JoinColumn(name = "id_image")
@@ -58,11 +57,11 @@ public class Execucao {
 		this.datahora = datahora;
 	}
 
-	public LocalDate getConcluido() {
+	public LocalDateTime getConcluido() {
 		return concluido;
 	}
 
-	public void setConcluido(LocalDate concluido) {
+	public void setConcluido(LocalDateTime concluido) {
 		this.concluido = concluido;
 	}
 
