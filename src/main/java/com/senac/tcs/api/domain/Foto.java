@@ -16,8 +16,8 @@ import javax.validation.constraints.NotNull;
 */
 
 @Entity
-@Table(name = "image")
-public class Image implements Serializable {
+@Table(name = "tb_foto")
+public class Foto implements Serializable {
 	/**
 	 * 
 	 */
@@ -26,7 +26,7 @@ public class Image implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="id")
-    private Integer idImage;
+    private Integer idFoto;
 	
 	@NotNull
     @Column(length = 100)
@@ -47,12 +47,12 @@ public class Image implements Serializable {
 	@Column(name="image_proc")
 	private byte[] imageProc;
 
-	public Integer getIdImage() {
-		return idImage;
+	public Integer getIdFoto() {
+		return idFoto;
 	}
 
-	public void setIdImage(Integer idImage) {
-		this.idImage = idImage;
+	public void setIdFoto(Integer idFoto) {
+		this.idFoto = idFoto;
 	}
 
 	public String getNome() {

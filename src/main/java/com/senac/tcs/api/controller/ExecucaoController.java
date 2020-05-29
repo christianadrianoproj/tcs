@@ -18,7 +18,7 @@ import com.senac.tcs.api.repository.ExecucaoRegraRespostaRepository;
 import com.senac.tcs.api.repository.ExecucaoRegraRepository;
 import com.senac.tcs.api.domain.Execucao;
 import com.senac.tcs.api.repository.ExecucaoRepository;
-import com.senac.tcs.api.repository.ImageRepository;
+import com.senac.tcs.api.repository.FotoRepository;
 import com.senac.tcs.api.repository.RegraRepository;
 import com.senac.tcs.api.repository.VariavelValorRepository;
 
@@ -56,7 +56,7 @@ public class ExecucaoController {
 	private RegraRepository repositoryRegra;
 
 	@Autowired
-	private ImageRepository repositoryImage;
+	private FotoRepository repositoryImage;
 
 	@Autowired
 	VariavelValorRepository repositoryVariavelValor;
@@ -226,8 +226,11 @@ public class ExecucaoController {
 	}
 
 	private void escreveLogsEntao(Regra regra, Boolean resultadoRegra) {
-		logTomadaDecisao += "     ENTÃO " + resultadoRegra + "\n";
-		logTomadaDecisao += " RESULTADO DA " + regra.getNome().toUpperCase() + ": " + resultadoRegra + "\n";
+		String str = "";
+		if (resultadoRegra) {str += "Verdadeira\n"; }else { str += "Falsa\n"; }
+		
+		logTomadaDecisao += "     ENTÃO " + str;
+		logTomadaDecisao += " RESULTADO DA " + regra.getNome().toUpperCase() + ": " + str;
 		logTomadaDecisao += "\n";
 	}
 
@@ -342,7 +345,7 @@ public class ExecucaoController {
 				}
 			}
 			exec = repository.getOne(exec.getIdExecucao());
-			logTomadaDecisao += " PERCENTUAL DE ACERTO: "
+			logTomadaDecisao += " Míldio: "
 					+ (new DecimalFormat("###.##")).format(exec.getPercentualAcerto()) + "% \n";
 			logTomadaDecisao += "\n";
 			System.out.println(logTomadaDecisao);

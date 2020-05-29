@@ -32,9 +32,9 @@ public class Execucao {
 	private LocalDateTime datahora;
 	
 	@ManyToOne
-	@JoinColumn(name = "id_image")
+	@JoinColumn(name = "id_foto")
 	//@JsonIgnore
-	private Image image;
+	private Foto image;
 
 	@OneToMany(mappedBy = "execucao")
 	private List<ExecucaoRegra> regras;
@@ -65,11 +65,11 @@ public class Execucao {
 		this.concluido = concluido;
 	}
 
-	public Image getImage() {
+	public Foto getImage() {
 		return image;
 	}
 
-	public void setImage(Image image) {
+	public void setImage(Foto image) {
 		this.image = image;
 	}
 

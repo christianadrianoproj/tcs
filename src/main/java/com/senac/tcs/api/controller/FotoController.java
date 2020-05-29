@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.senac.tcs.api.domain.Image;
-import com.senac.tcs.api.repository.ImageRepository;
+import com.senac.tcs.api.domain.Foto;
+import com.senac.tcs.api.repository.FotoRepository;
 
 /**
 *
@@ -22,29 +22,29 @@ import com.senac.tcs.api.repository.ImageRepository;
 */
 
 @RestController
-@RequestMapping("/image")
+@RequestMapping("/foto")
 @CrossOrigin(origins = "*")
-public class ImageController {
+public class FotoController {
 	@Autowired
-	private ImageRepository repository;
+	private FotoRepository repository;
 
 
-	@PostMapping("/salvaImage")
-	public Image salvaVariavel(@RequestBody Image v) {
+	@PostMapping("/salvaFoto")
+	public Foto salvaVariavel(@RequestBody Foto v) {
 		return repository.save(v);
 	}
 
 
 	@GetMapping("/{id}")
 	public ResponseEntity<?> find(@PathVariable("id") Integer id) {
-		Optional<Image> image = repository.findById(id);
+		Optional<Foto> image = repository.findById(id);
 		if (image.isPresent()) {
 			return ResponseEntity.ok(image.get());
 		}
 		return ResponseEntity.notFound().build();
 	}
 
-	@DeleteMapping("/deletaImage/{id}")
+	@DeleteMapping("/deletaFoto/{id}")
 	public void delete(@PathVariable("id") Integer id) {
 		repository.deleteById(id);
 	}
