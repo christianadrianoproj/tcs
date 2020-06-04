@@ -1,6 +1,5 @@
 package com.senac.tcs.api.controller;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,7 +36,7 @@ public class RegraController {
 
 	@Autowired
 	private RegraItemRepository repositoryRegraItem;
-	
+
 	@Autowired
 	private RegraItemResultadoRepository repositoryRegraItemResultado;
 
@@ -45,7 +44,7 @@ public class RegraController {
 	public List<Regra> findAll() {
 		return repository.findAll();
 	}
-	
+
 	@GetMapping("/perguntas")
 	public List<Regra> getPerguntas() {
 		List<Regra> lista = new ArrayList<Regra>();
@@ -54,8 +53,8 @@ public class RegraController {
 				if (!item.getPergunta().trim().equals("")) {
 					if (lista.indexOf(regra) == -1) {
 						lista.add(regra);
-					}					
-				}	
+					}
+				}
 			}
 		}
 		return lista;
@@ -63,7 +62,21 @@ public class RegraController {
 
 	@PostMapping("/salvaRegra")
 	public Regra salvaRegra(@RequestBody Regra v) {
-		return repository.save(v);
+		Regra var = repository.save(v);
+		v.setIdRegra(var.getIdRegra());
+		if (v.getItens() != null) {
+			for (RegraItem i : v.getItens()) {
+				i.setRegra(var);
+				repositoryRegraItem.save(i);
+			}
+		}
+		if (v.getResultados() != null) {
+			for (RegraItemResultado i : v.getResultados()) {
+				i.setRegra(var);
+				repositoryRegraItemResultado.save(i);
+			}
+		}
+		return repository.findById(var.getIdRegra()).get();
 	}
 
 	@PostMapping("/adicionaItem/{idregra}")
@@ -76,14 +89,15 @@ public class RegraController {
 	}
 
 	@PostMapping("/adicionaItemResultado/{idregra}")
-	public ResponseEntity<?> adicionaValor(@PathVariable("idregra") Integer idregra, @RequestBody RegraItemResultado item) {
+	public ResponseEntity<?> adicionaValor(@PathVariable("idregra") Integer idregra,
+			@RequestBody RegraItemResultado item) {
 		Regra regra = repository.findById(idregra).get();
 		item.setRegra(regra);
 		repositoryRegraItemResultado.save(item);
 		Optional<Regra> r = repository.findById(idregra);
 		return ResponseEntity.ok(r.get());
 	}
-	
+
 	@PostMapping("/deletaItem/{idregra}")
 	public Regra deleteItem(@PathVariable("idregra") Integer idregra, @RequestBody RegraItem item) {
 		repositoryRegraItem.deleteById(item.getIdRegraItem());
@@ -95,7 +109,7 @@ public class RegraController {
 		repositoryRegraItemResultado.deleteById(item.getIdRegraItemResultado());
 		return repository.findById(idregra).get();
 	}
-	
+
 	@GetMapping("/{id}")
 	public ResponseEntity<?> find(@PathVariable("id") Integer id) {
 		Optional<Regra> regra = repository.findById(id);

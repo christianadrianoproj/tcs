@@ -41,7 +41,13 @@ public class VariavelController {
 
 	@PostMapping("/salvaVariavel")
 	public Variavel salvaVariavel(@RequestBody Variavel v) {
-		return repository.save(v);
+		Variavel var = repository.save(v);
+		v.setIdVariavel(var.getIdVariavel());
+		for (VariavelValor i : v.getValores()) {
+			i.setVariavel(var);
+			repositoryVariavelValor.save(i);
+		}		
+		return repository.findById(var.getIdVariavel()).get();
 	}
 
 	@PostMapping("/adicionaValor/{idvariavel}")
