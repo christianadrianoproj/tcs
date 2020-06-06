@@ -40,9 +40,6 @@ public class RegraItem {
 	@NotNull    
 	private VariavelValor variavelValor;
 	
-    @Column(length = 500)
-    private String pergunta;
-	
 	@ManyToOne
 	@JoinColumn(name="id_regra")
 	@NotNull
@@ -71,14 +68,6 @@ public class RegraItem {
 
 	public void setVariavel(Variavel variavel) {
 		this.variavel = variavel;
-	}
-
-	public String getPergunta() {
-		return pergunta;
-	}
-
-	public void setPergunta(String pergunta) {
-		this.pergunta = pergunta;
 	}
 
 	public String getCondicional() {

@@ -3,6 +3,7 @@ package com.senac.tcs.api.domain;
 import java.time.LocalDate;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+
 
 /**
 *
@@ -27,16 +29,21 @@ public class Regra {
     private Integer idRegra;
 	
 	@NotNull
+    private Integer ordem;
+	
+	@NotNull
     @Column(length = 200)
     private String nome;
     
 	@NotNull
     private LocalDate dataRegra;
 
-    @OneToMany(mappedBy = "regra")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "regra")
+    //@OneToMany(mappedBy = "regra")
     private List<RegraItem> itens;
     
-    @OneToMany(mappedBy = "regra")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "regra")
+    //@OneToMany(mappedBy = "regra")
     private List<RegraItemResultado> resultados;
 
 	public Integer getIdRegra() {
@@ -77,6 +84,14 @@ public class Regra {
 
 	public void setResultados(List<RegraItemResultado> resultados) {
 		this.resultados = resultados;
+	}
+
+	public Integer getOrdem() {
+		return ordem;
+	}
+
+	public void setOrdem(Integer ordem) {
+		this.ordem = ordem;
 	}
     
 }

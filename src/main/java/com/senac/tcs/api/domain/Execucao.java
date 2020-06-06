@@ -3,6 +3,7 @@ package com.senac.tcs.api.domain;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -36,7 +37,7 @@ public class Execucao {
 	//@JsonIgnore
 	private Foto image;
 
-	@OneToMany(mappedBy = "execucao")
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "execucao")
 	private List<ExecucaoRegra> regras;
 
 	private LocalDateTime concluido;

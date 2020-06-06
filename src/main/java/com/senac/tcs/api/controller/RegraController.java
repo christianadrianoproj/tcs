@@ -1,13 +1,16 @@
 package com.senac.tcs.api.controller;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
 import com.senac.tcs.api.domain.RegraItem;
 import com.senac.tcs.api.domain.RegraItemResultado;
+import com.senac.tcs.api.repository.InterfaceRepository;
 import com.senac.tcs.api.repository.RegraItemRepository;
 import com.senac.tcs.api.repository.RegraItemResultadoRepository;
+import com.senac.tcs.api.domain.Interface;
 import com.senac.tcs.api.domain.Regra;
 import com.senac.tcs.api.repository.RegraRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Sort;
 
 /**
  *
@@ -38,11 +42,20 @@ public class RegraController {
 	private RegraItemRepository repositoryRegraItem;
 
 	@Autowired
+	private InterfaceRepository repositoryInterface;
+
+	@Autowired
 	private RegraItemResultadoRepository repositoryRegraItemResultado;
 
 	@GetMapping
 	public List<Regra> findAll() {
-		return repository.findAll();
+		List<Regra> lista = repository.findAll(Sort.by("ordem"));
+		for (Regra r : lista) {
+			List<RegraItem> itens = r.getItens();
+			itens.sort(Comparator.comparingInt(RegraItem::getConectivo));
+			r.setItens(itens);
+		}
+		return lista;
 	}
 
 	@GetMapping("/perguntas")
@@ -50,9 +63,12 @@ public class RegraController {
 		List<Regra> lista = new ArrayList<Regra>();
 		for (Regra regra : repository.findAll()) {
 			for (RegraItem item : regra.getItens()) {
-				if (!item.getPergunta().trim().equals("")) {
-					if (lista.indexOf(regra) == -1) {
-						lista.add(regra);
+				Interface inter = repositoryInterface.findByVariavel(item.getVariavel());
+				if (inter != null) {
+					if (!inter.getPergunta().trim().equals("")) {
+						if (lista.indexOf(regra) == -1) {
+							lista.add(regra);
+						}
 					}
 				}
 			}
