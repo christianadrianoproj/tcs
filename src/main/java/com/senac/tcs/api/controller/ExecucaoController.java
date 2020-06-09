@@ -106,24 +106,28 @@ public class ExecucaoController {
 		Execucao exec = repository.getOne(idexecucao);
 		int index = -1;
 		for (ExecucaoRegra regra : exec.getRegras()) {
-			index += 1;
 			for (ExecucaoRegraResposta resp : regra.getRespostas()) {
+				index += 1;
 				String param = arrayRespostas.get(index);
 				resp.setExecucaoRegra(regra);
-				if (Integer.parseInt(param) > 0) {
+				if (Integer.parseInt(param) == -1) {
+					resp.setResposta(repositoryVariavelValor.getOne(1)); // Sem resposta
+					repositoryExecucaoRegraResposta.save(resp);
+				}
+				else {
 					resp.setResposta(repositoryVariavelValor.getOne(Integer.parseInt(param)));
 					repositoryExecucaoRegraResposta.save(resp);
 				}
 			}
 		}
-		for (ExecucaoRegra regra : exec.getRegras()) {
+		/*for (ExecucaoRegra regra : exec.getRegras()) {
 			for (ExecucaoRegraResposta resp : regra.getRespostas()) {
 				if (resp.getResposta() == null) {
 					resp.setResposta(repositoryVariavelValor.getOne(1)); // Sem resposta
 					repositoryExecucaoRegraResposta.save(resp);
 				}
 			}
-		}
+		}*/
 		exec.setConcluido(LocalDateTime.of(LocalDate.now(), LocalTime.now()));
 		repository.save(exec);
 
