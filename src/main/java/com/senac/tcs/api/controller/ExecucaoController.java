@@ -100,14 +100,27 @@ public class ExecucaoController {
 		return exec;
 	}
 
-	@PostMapping("/adicionaRespostas")
-	public ResponseEntity<?> adicionaRespostas(@RequestBody Execucao exec) {
+	@PostMapping("/adicionaRespostas/{idexecucao}")
+	public ResponseEntity<?> adicionaRespostas(@PathVariable("idexecucao") Integer idexecucao,
+			@RequestBody List<String> arrayRespostas) {
+		/*
+		 * System.out.println("idexecucao: " + idexecucao);
+		 * System.out.println("arrayRespostas: " + arrayRespostas);
+		 */
+		Execucao exec = repository.getOne(idexecucao);
 		for (ExecucaoRegra regra : exec.getRegras()) {
 			for (ExecucaoRegraResposta resp : regra.getRespostas()) {
-				if (resp.getResposta() != null) {
-					resp.setExecucaoRegra(regra);
-					repositoryExecucaoRegraResposta.save(resp);					
-				}								
+				for (String param : arrayRespostas) {
+					if (resp.getResposta() != null) {
+						if (resp.getRegraItem().getVariavelValor().getIdVariavelValor() == Integer.parseInt(param)) {
+							resp.setExecucaoRegra(regra);
+							if (resp.getResposta() == null) {
+								resp.setResposta(repositoryVariavelValor.getOne(Integer.parseInt(param)));
+								repositoryExecucaoRegraResposta.save(resp);
+							}
+						}
+					}
+				}
 			}
 		}
 		for (ExecucaoRegra regra : exec.getRegras()) {
@@ -219,8 +232,12 @@ public class ExecucaoController {
 
 	private void escreveLogsEntao(Regra regra, Boolean resultadoRegra) {
 		String str = "";
-		if (resultadoRegra) {str += "Verdadeira\n"; }else { str += "Falsa\n"; }
-		
+		if (resultadoRegra) {
+			str += "Verdadeira\n";
+		} else {
+			str += "Falsa\n";
+		}
+
 		logTomadaDecisao += "     ENTÃO " + str;
 		logTomadaDecisao += " RESULTADO DA " + regra.getNome().toUpperCase() + ": " + str;
 		logTomadaDecisao += "\n";
@@ -292,15 +309,17 @@ public class ExecucaoController {
 
 					} else {
 						if (Condicional.equals("=")) {
-							//if (valorRegra.equalsIgnoreCase(valorResposta)) {
-							if (i.getResposta().getIdVariavelValor() == i.getRegraItem().getVariavelValor().getIdVariavelValor()) {
+							// if (valorRegra.equalsIgnoreCase(valorResposta)) {
+							if (i.getResposta().getIdVariavelValor() == i.getRegraItem().getVariavelValor()
+									.getIdVariavelValor()) {
 								condicaoItemRegra = true;
 							} else {
 								condicaoItemRegra = false;
 							}
 						} else if (Condicional.equals("<>")) {
-							//if (!valorRegra.equalsIgnoreCase(valorResposta)) {
-							if (i.getResposta().getIdVariavelValor() != i.getRegraItem().getVariavelValor().getIdVariavelValor()) {
+							// if (!valorRegra.equalsIgnoreCase(valorResposta)) {
+							if (i.getResposta().getIdVariavelValor() != i.getRegraItem().getVariavelValor()
+									.getIdVariavelValor()) {
 								condicaoItemRegra = true;
 							} else {
 								condicaoItemRegra = false;
@@ -339,8 +358,7 @@ public class ExecucaoController {
 				}
 			}
 			exec = repository.getOne(exec.getIdExecucao());
-			logTomadaDecisao += " Míldio: "
-					+ (new DecimalFormat("###.##")).format(exec.getPercentualAcerto()) + "% \n";
+			logTomadaDecisao += " Míldio: " + (new DecimalFormat("###.##")).format(exec.getPercentualAcerto()) + "% \n";
 			logTomadaDecisao += "\n";
 			System.out.println(logTomadaDecisao);
 		} else {
