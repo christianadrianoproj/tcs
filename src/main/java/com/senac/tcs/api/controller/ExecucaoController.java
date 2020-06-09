@@ -104,10 +104,10 @@ public class ExecucaoController {
 	public ResponseEntity<?> adicionaRespostas(@PathVariable("idexecucao") Integer idexecucao,
 			@RequestBody List<String> arrayRespostas) {
 		Execucao exec = repository.getOne(idexecucao);
+		int index = -1;
 		for (ExecucaoRegra regra : exec.getRegras()) {
-			int index = -1;
+			index += 1;
 			for (ExecucaoRegraResposta resp : regra.getRespostas()) {
-				index += 1;
 				if (index < arrayRespostas.size()) {
 					String param = arrayRespostas.get(index);
 					resp.setExecucaoRegra(regra);
