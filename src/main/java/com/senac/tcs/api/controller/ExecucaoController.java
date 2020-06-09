@@ -108,13 +108,11 @@ public class ExecucaoController {
 		for (ExecucaoRegra regra : exec.getRegras()) {
 			index += 1;
 			for (ExecucaoRegraResposta resp : regra.getRespostas()) {
-				if (index < arrayRespostas.size()) {
-					String param = arrayRespostas.get(index);
-					resp.setExecucaoRegra(regra);
-					if (Integer.parseInt(param) > 0) {
-						resp.setResposta(repositoryVariavelValor.getOne(Integer.parseInt(param)));
-						repositoryExecucaoRegraResposta.save(resp);
-					}
+				String param = arrayRespostas.get(index);
+				resp.setExecucaoRegra(regra);
+				if (Integer.parseInt(param) > 0) {
+					resp.setResposta(repositoryVariavelValor.getOne(Integer.parseInt(param)));
+					repositoryExecucaoRegraResposta.save(resp);
 				}
 			}
 		}
