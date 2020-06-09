@@ -106,14 +106,12 @@ public class ExecucaoController {
 		Execucao exec = repository.getOne(idexecucao);
 		for (ExecucaoRegra regra : exec.getRegras()) {
 			int index = -1;
-			String param;
 			for (ExecucaoRegraResposta resp : regra.getRespostas()) {
 				index += 1;
-				param = "-1";
 				if (index < arrayRespostas.size()) {
-					param = arrayRespostas.get(index);
+					String param = arrayRespostas.get(index);
 					resp.setExecucaoRegra(regra);
-					if ((resp.getResposta() == null) && (Integer.parseInt(param) > 0)) {
+					if (Integer.parseInt(param) > 0) {
 						resp.setResposta(repositoryVariavelValor.getOne(Integer.parseInt(param)));
 						repositoryExecucaoRegraResposta.save(resp);
 					}
