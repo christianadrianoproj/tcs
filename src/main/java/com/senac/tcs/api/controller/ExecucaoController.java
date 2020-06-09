@@ -103,22 +103,19 @@ public class ExecucaoController {
 	@PostMapping("/adicionaRespostas/{idexecucao}")
 	public ResponseEntity<?> adicionaRespostas(@PathVariable("idexecucao") Integer idexecucao,
 			@RequestBody List<String> arrayRespostas) {
-		/*
-		 * System.out.println("idexecucao: " + idexecucao);
-		 * System.out.println("arrayRespostas: " + arrayRespostas);
-		 */
 		Execucao exec = repository.getOne(idexecucao);
 		for (ExecucaoRegra regra : exec.getRegras()) {
+			int index = -1;
+			String param;
 			for (ExecucaoRegraResposta resp : regra.getRespostas()) {
-				for (String param : arrayRespostas) {
-					if (resp.getResposta() != null) {
-						if (resp.getRegraItem().getVariavelValor().getIdVariavelValor() == Integer.parseInt(param)) {
-							resp.setExecucaoRegra(regra);
-							if (resp.getResposta() == null) {
-								resp.setResposta(repositoryVariavelValor.getOne(Integer.parseInt(param)));
-								repositoryExecucaoRegraResposta.save(resp);
-							}
-						}
+				index += 1;
+				param = "-1";
+				if (index < arrayRespostas.size()) {
+					param = arrayRespostas.get(index);
+					resp.setExecucaoRegra(regra);
+					if ((resp.getResposta() == null) && (Integer.parseInt(param) > 0)) {
+						resp.setResposta(repositoryVariavelValor.getOne(Integer.parseInt(param)));
+						repositoryExecucaoRegraResposta.save(resp);
 					}
 				}
 			}
