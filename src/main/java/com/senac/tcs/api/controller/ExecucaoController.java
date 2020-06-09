@@ -100,28 +100,20 @@ public class ExecucaoController {
 		return exec;
 	}
 
-	@PostMapping("/adicionaRespostas/{idexecucao}")
-	public ResponseEntity<?> iniciaExecucao(@PathVariable("idexecucao") Integer idexecucao,
-			@RequestBody List<String> arrayRespostas) {
-		/*System.out.println("idexecucao: " + idexecucao);
-		System.out.println("arrayRespostas: " + arrayRespostas);*/
-		Execucao exec = repository.getOne(idexecucao);
+	@PostMapping("/adicionaRespostas")
+	public ResponseEntity<?> adicionaRespostas(@RequestBody Execucao exec) {
 		for (ExecucaoRegra regra : exec.getRegras()) {
 			for (ExecucaoRegraResposta resp : regra.getRespostas()) {
-				for (String param : arrayRespostas) {
-					if (resp.getRegraItem().getVariavelValor().getIdVariavelValor() == Integer.parseInt(param)) {
-						if (resp.getResposta() == null) {
-							resp.setResposta(repositoryVariavelValor.getOne(Integer.parseInt(param)));
-							repositoryExecucaoRegraResposta.save(resp);
-						}
-					}
-				}
+				if (resp.getResposta() != null) {
+					resp.setExecucaoRegra(regra);
+					repositoryExecucaoRegraResposta.save(resp);					
+				}								
 			}
 		}
 		for (ExecucaoRegra regra : exec.getRegras()) {
 			for (ExecucaoRegraResposta resp : regra.getRespostas()) {
 				if (resp.getResposta() == null) {
-					resp.setResposta(repositoryVariavelValor.getOne(1));
+					resp.setResposta(repositoryVariavelValor.getOne(1)); // Sem resposta
 					repositoryExecucaoRegraResposta.save(resp);
 				}
 			}
@@ -300,13 +292,15 @@ public class ExecucaoController {
 
 					} else {
 						if (Condicional.equals("=")) {
-							if (valorRegra.equalsIgnoreCase(valorResposta)) {
+							//if (valorRegra.equalsIgnoreCase(valorResposta)) {
+							if (i.getResposta().getIdVariavelValor() == i.getRegraItem().getVariavelValor().getIdVariavelValor()) {
 								condicaoItemRegra = true;
 							} else {
 								condicaoItemRegra = false;
 							}
 						} else if (Condicional.equals("<>")) {
-							if (!valorRegra.equalsIgnoreCase(valorResposta)) {
+							//if (!valorRegra.equalsIgnoreCase(valorResposta)) {
+							if (i.getResposta().getIdVariavelValor() != i.getRegraItem().getVariavelValor().getIdVariavelValor()) {
 								condicaoItemRegra = true;
 							} else {
 								condicaoItemRegra = false;
