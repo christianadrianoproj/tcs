@@ -1,5 +1,6 @@
 package com.senac.tcs.api.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,8 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.senac.tcs.api.domain.Interface;
+import com.senac.tcs.api.domain.Regra;
+import com.senac.tcs.api.domain.RegraItem;
 import com.senac.tcs.api.domain.Variavel;
 import com.senac.tcs.api.repository.InterfaceRepository;
+import com.senac.tcs.api.repository.RegraRepository;
 import com.senac.tcs.api.repository.VariavelRepository;
 
 /**
@@ -33,10 +37,32 @@ public class InterfaceController {
 	
 	@Autowired
 	private VariavelRepository repositoryVariavel;
+	
+	@Autowired
+	private RegraRepository repositoryRegra;
 
 	@GetMapping
 	public List<Interface> findAll() {
 		return repository.findAll();
+	}
+	
+	@GetMapping("/interfacesComRegras")
+	public List<Interface> findInterfacesByRegra() {
+		List<Interface> listaRetorno = new ArrayList<Interface>();
+		
+		List<Interface> lista = repository.findAll();
+		for (Interface i : lista) {
+			for (Regra r : repositoryRegra.findAll()) {
+				for (RegraItem item : r.getItens()) {					
+			      if (i.getVariavel().getIdVariavel() == item.getVariavel().getIdVariavel()) {
+			    	  if (listaRetorno.indexOf(i) == -1) {
+			    		  listaRetorno.add(i);
+			    	  }
+			      }
+				}
+			}
+		}
+		return listaRetorno;
 	}
 
 	@PostMapping("/salvaInterface")
