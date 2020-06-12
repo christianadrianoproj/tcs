@@ -3,7 +3,6 @@ package com.senac.tcs.api.domain;
 import java.time.LocalDate;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -38,11 +37,11 @@ public class Regra {
 	@NotNull
     private LocalDate dataRegra;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "regra")
+    @OneToMany(orphanRemoval = true, mappedBy = "regra")
     //@OneToMany(mappedBy = "regra")
     private List<RegraItem> itens;
     
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "regra")
+    @OneToMany(orphanRemoval = true, mappedBy = "regra")
     //@OneToMany(mappedBy = "regra")
     private List<RegraItemResultado> resultados;
 

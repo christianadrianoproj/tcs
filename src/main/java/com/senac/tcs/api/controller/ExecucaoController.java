@@ -23,6 +23,7 @@ import com.senac.tcs.api.repository.RegraRepository;
 import com.senac.tcs.api.repository.VariavelValorRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -75,7 +76,7 @@ public class ExecucaoController {
 		Execucao e = repository.save(exec);
 		exec.setIdExecucao(e.getIdExecucao());
 		System.out.println("Execucao Criado: " + exec.getIdExecucao());
-		for (Regra regra : repositoryRegra.findAll()) {
+		for (Regra regra : repositoryRegra.findAll(Sort.by("ordem"))) {
 			ExecucaoRegra execRegra = new ExecucaoRegra();
 			execRegra.setExecucao(exec);
 			execRegra.setRespostas(new ArrayList<ExecucaoRegraResposta>());

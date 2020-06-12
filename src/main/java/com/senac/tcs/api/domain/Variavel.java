@@ -31,7 +31,7 @@ public class Variavel {
 	@NotNull    
     private Integer tipoVariavel;
 	
-    @OneToMany(mappedBy = "variavel")
+    @OneToMany(orphanRemoval = true, mappedBy = "variavel")
     private List<VariavelValor> valores;
 
 	public Integer getIdVariavel() {

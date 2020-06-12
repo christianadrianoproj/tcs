@@ -2,7 +2,6 @@ package com.senac.tcs.api.domain;
 
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -42,7 +41,7 @@ public class ExecucaoRegra {
 	//@JsonIgnore
 	private Regra regra;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "execucaoRegra")
+	@OneToMany(orphanRemoval = true, mappedBy = "execucaoRegra")
 	private List<ExecucaoRegraResposta> respostas;
 
 	private Boolean validou;
