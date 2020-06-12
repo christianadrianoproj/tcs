@@ -37,12 +37,10 @@ public class Regra {
 	@NotNull
     private LocalDate dataRegra;
 
-    @OneToMany(orphanRemoval = true, mappedBy = "regra")
-    //@OneToMany(mappedBy = "regra")
+    @OneToMany(mappedBy = "regra")
     private List<RegraItem> itens;
     
-    @OneToMany(orphanRemoval = true, mappedBy = "regra")
-    //@OneToMany(mappedBy = "regra")
+    @OneToMany(mappedBy = "regra")
     private List<RegraItemResultado> resultados;
 
 	public Integer getIdRegra() {

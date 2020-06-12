@@ -201,6 +201,8 @@ public class RegraController {
 		for (RegraItemResultado i : regra.getResultados()) {
 			repositoryRegraItemResultado.deleteById(i.getIdRegraItemResultado());
 		}
+		
+		regra = repository.findById(id).get();
 		repository.deleteById(id);
 	}
 }

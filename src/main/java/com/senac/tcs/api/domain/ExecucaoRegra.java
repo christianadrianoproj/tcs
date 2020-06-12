@@ -41,7 +41,7 @@ public class ExecucaoRegra {
 	//@JsonIgnore
 	private Regra regra;
 
-	@OneToMany(orphanRemoval = true, mappedBy = "execucaoRegra")
+	@OneToMany(mappedBy = "execucaoRegra")
 	private List<ExecucaoRegraResposta> respostas;
 
 	private Boolean validou;

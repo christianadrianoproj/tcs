@@ -36,7 +36,7 @@ public class Execucao {
 	//@JsonIgnore
 	private Foto image;
 
-	@OneToMany(orphanRemoval = true, mappedBy = "execucao")
+	@OneToMany(mappedBy = "execucao")
 	private List<ExecucaoRegra> regras;
 
 	private LocalDateTime concluido;
