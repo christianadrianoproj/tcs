@@ -123,23 +123,7 @@ public class ExecucaoController {
 				}
 			}
 		}
-
-		/*
-		 * int index = -1; for (ExecucaoRegra regra : exec.getRegras()) { for
-		 * (ExecucaoRegraResposta resp : regra.getRespostas()) { index += 1;
-		 * resp.getRegraItem() String param = arrayRespostas.get(index);
-		 * resp.setExecucaoRegra(regra); if (Integer.parseInt(param) == -1) {
-		 * resp.setResposta(repositoryVariavelValor.getOne(1)); // Sem resposta
-		 * repositoryExecucaoRegraResposta.save(resp); } else {
-		 * resp.setResposta(repositoryVariavelValor.getOne(Integer.parseInt(param)));
-		 * repositoryExecucaoRegraResposta.save(resp); } } }
-		 */
-		/*
-		 * for (ExecucaoRegra regra : exec.getRegras()) { for (ExecucaoRegraResposta
-		 * resp : regra.getRespostas()) { if (resp.getResposta() == null) {
-		 * resp.setResposta(repositoryVariavelValor.getOne(1)); // Sem resposta
-		 * repositoryExecucaoRegraResposta.save(resp); } } }
-		 */
+		
 		exec.setConcluido(LocalDateTime.of(LocalDate.now(), LocalTime.now()));
 		repository.save(exec);
 

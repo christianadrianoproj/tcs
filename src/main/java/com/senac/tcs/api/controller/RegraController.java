@@ -7,9 +7,12 @@ import java.util.Optional;
 
 import com.senac.tcs.api.domain.RegraItem;
 import com.senac.tcs.api.domain.RegraItemResultado;
+import com.senac.tcs.api.repository.ExecucaoRepository;
 import com.senac.tcs.api.repository.InterfaceRepository;
 import com.senac.tcs.api.repository.RegraItemRepository;
 import com.senac.tcs.api.repository.RegraItemResultadoRepository;
+import com.senac.tcs.api.domain.Execucao;
+import com.senac.tcs.api.domain.ExecucaoRegra;
 import com.senac.tcs.api.domain.Interface;
 import com.senac.tcs.api.domain.Regra;
 import com.senac.tcs.api.repository.RegraRepository;
@@ -43,6 +46,9 @@ public class RegraController {
 
 	@Autowired
 	private InterfaceRepository repositoryInterface;
+
+	@Autowired
+	private ExecucaoRepository repositoryExecucao;
 
 	@Autowired
 	private RegraItemResultadoRepository repositoryRegraItemResultado;
@@ -116,12 +122,47 @@ public class RegraController {
 
 	@PostMapping("/deletaItem/{idregra}")
 	public Regra deleteItem(@PathVariable("idregra") Integer idregra, @RequestBody RegraItem item) {
+		ArrayList<Execucao> listaExec = new ArrayList<Execucao>();
+		for (Execucao e : repositoryExecucao.findAll()) {
+			for (ExecucaoRegra r : e.getRegras()) {
+				for (RegraItem ir : r.getRegra().getItens()) {
+					if (ir.getIdRegraItem() == item.getIdRegraItem()) {
+						if (listaExec.indexOf(e) == -1) {
+							listaExec.add(e);
+						}
+					}
+				}
+			}
+		}
+		
+		for (int i = 0; i < listaExec.size(); i++) {
+			repositoryExecucao.deleteById(listaExec.get(i).getIdExecucao());
+		}
+		
 		repositoryRegraItem.deleteById(item.getIdRegraItem());
 		return repository.findById(idregra).get();
 	}
 
 	@PostMapping("/deletaItemResultado/{idregra}")
 	public Regra deleteResultado(@PathVariable("idregra") Integer idregra, @RequestBody RegraItemResultado item) {
+
+		ArrayList<Execucao> listaExec = new ArrayList<Execucao>();
+		for (Execucao e : repositoryExecucao.findAll()) {
+			for (ExecucaoRegra r : e.getRegras()) {
+				for (RegraItemResultado ir : r.getRegra().getResultados()) {
+					if (ir.getIdRegraItemResultado() == item.getIdRegraItemResultado()) {
+						if (listaExec.indexOf(e) == -1) {
+							listaExec.add(e);
+						}
+					}
+				}
+			}
+		}
+		
+		for (int i = 0; i < listaExec.size(); i++) {
+			repositoryExecucao.deleteById(listaExec.get(i).getIdExecucao());
+		}
+
 		repositoryRegraItemResultado.deleteById(item.getIdRegraItemResultado());
 		return repository.findById(idregra).get();
 	}
@@ -138,6 +179,22 @@ public class RegraController {
 	@DeleteMapping("/{id}")
 	public void delete(@PathVariable("id") Integer id) {
 		Regra regra = repository.findById(id).get();
+
+		ArrayList<Execucao> listaExec = new ArrayList<Execucao>();
+		for (Execucao e : repositoryExecucao.findAll()) {
+			for (ExecucaoRegra r : e.getRegras()) {
+				if (r.getRegra().getIdRegra() == regra.getIdRegra()) {
+					if (listaExec.indexOf(e) == -1) {
+						listaExec.add(e);
+					}
+				}
+			}
+		}
+
+		for (int i = 0; i < listaExec.size(); i++) {
+			repositoryExecucao.deleteById(listaExec.get(i).getIdExecucao());
+		}
+
 		for (RegraItem i : regra.getItens()) {
 			repositoryRegraItem.deleteById(i.getIdRegraItem());
 		}
