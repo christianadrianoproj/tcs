@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -177,6 +178,7 @@ public class ExecucaoController {
 				lista.add(i.getRegra());
 			}
 		}
+		lista.sort(Comparator.comparingInt(Regra::getOrdem));
 		return lista;
 	}
 
@@ -235,9 +237,12 @@ public class ExecucaoController {
 		logTomadaDecisao += " RESULTADO DA " + regra.getNome().toUpperCase() + ": " + str;
 		logTomadaDecisao += "\n";
 	}
-
+	
+	/**
+	 * A partir das respostas obtida sobre os sintomas/características selecionadas/identificas a máquina de inferência valida a probabilidade do Míldio
+	 */	
 	@GetMapping("/tomadaDecisao/{idexecucao}")
-	public Execucao tomadadeDeDecisao(@PathVariable("idexecucao") Integer idexecucao) {
+	public Execucao tomadaDeDecisao(@PathVariable("idexecucao") Integer idexecucao) {
 		Execucao exec = repository.findById(idexecucao).get();
 		logTomadaDecisao = "";
 		if (exec.getConcluido() != null) {
@@ -246,18 +251,14 @@ public class ExecucaoController {
 				List<Boolean> validacaoItemRegra = new ArrayList<Boolean>();
 				List<Integer> conectivoItemRegra = new ArrayList<Integer>();
 				logTomadaDecisao += "------------------------------------------------------------\n";
-
-				// executa validacao item a item da regra
+				/* executa validação item a item (condição) da regra */
 				for (ExecucaoRegraResposta i : getRespostasByRegra(exec, regra)) {
-
 					String Condicional = i.getRegraItem().getCondicional();
 					String valorResposta = i.getResposta().getValor();
 					String valorRegra = i.getRegraItem().getVariavelValor().getValor();
 					Integer tipoVariavel = i.getRegraItem().getVariavel().getTipoVariavel();
 					Integer conectivo = i.getRegraItem().getConectivo();
-
 					escreveLogsSE(i.getRegraItem(), valorResposta);
-
 					if (tipoVariavel == TipoVariavel.Numerica.getTipo()) {
 						if (Condicional.equals("=")) {
 							if (Float.parseFloat(valorRegra) == Float.parseFloat(valorResposta)) {
@@ -266,7 +267,6 @@ public class ExecucaoController {
 							} else {
 								condicaoItemRegra = false;
 							}
-
 						} else if (Condicional.equals("<>")) {
 							if (Float.parseFloat(valorRegra) != Float.parseFloat(valorResposta)) {
 								condicaoItemRegra = true;
@@ -302,7 +302,6 @@ public class ExecucaoController {
 
 					} else {
 						if (Condicional.equals("=")) {
-							// if (valorRegra.equalsIgnoreCase(valorResposta)) {
 							if (i.getResposta().getIdVariavelValor() == i.getRegraItem().getVariavelValor()
 									.getIdVariavelValor()) {
 								condicaoItemRegra = true;
@@ -310,7 +309,6 @@ public class ExecucaoController {
 								condicaoItemRegra = false;
 							}
 						} else if (Condicional.equals("<>")) {
-							// if (!valorRegra.equalsIgnoreCase(valorResposta)) {
 							if (i.getResposta().getIdVariavelValor() != i.getRegraItem().getVariavelValor()
 									.getIdVariavelValor()) {
 								condicaoItemRegra = true;
@@ -325,8 +323,7 @@ public class ExecucaoController {
 					i.setAcertou(condicaoItemRegra);
 					repositoryExecucaoRegraResposta.save(i);
 				}
-
-				// junta as validacoes dos itens na regra
+				/* Aplica a validação da regra: Junção das validações dos itens (condições) da regra */
 				Boolean resultadoRegra = true;
 				for (int i = 0; i < validacaoItemRegra.size(); i++) {
 					Integer conectivo = conectivoItemRegra.get(i);
@@ -357,7 +354,6 @@ public class ExecucaoController {
 		} else {
 			exec = null;
 		}
-
 		return exec;
 	}
 }
